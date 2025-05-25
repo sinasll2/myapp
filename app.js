@@ -2,10 +2,10 @@ import { Client, Functions } from "https://esm.sh/appwrite@13.0.0";
 
 const client = new Client()
   .setEndpoint("https://fra.cloud.appwrite.io/v1")
-  .setProject("6800cf6c0038c2026f07");
+  .setProject("68334c60000199e18987");
 
 const functions = new Functions(client);
-const FUNCTION_ID = "6800d0a4001cb28a32f5";
+const FUNCTION_ID = "683384ef00117ec193da";
 
 // DOM Elements
 const minedEl = document.getElementById('mined');
@@ -606,7 +606,7 @@ if (submitBtn) {
           const referralCode = userData.ownReferralCode;
       
           const shareText = `\nUse my $BLACK code today\n\`${dailyCode}\``;
-          const shareUrl  = `https://t.me/blacktestvbot?startapp=${referralCode}`;
+          const shareUrl  = `https://t.me/theblacktgbot?startapp=${referralCode}`;
             
             if (window.Telegram?.WebApp) {
                 window.Telegram.WebApp.openTelegramLink(
@@ -627,7 +627,7 @@ if (copyReferralBtn) {
     copyReferralBtn.addEventListener('click', async () => {
         try {
             const code = userData.ownReferralCode;
-            const link = `https://t.me/blacktestvbot?startapp=${code}`;
+            const link = `https://t.me/theblacktgbot?startapp=${code}`;
             await navigator.clipboard.writeText(link);
             copyReferralBtn.textContent = 'Copied';
             setTimeout(() => copyReferralBtn.textContent = 'Copy', 2000);
@@ -642,7 +642,7 @@ if (copyReferralBtn) {
         inviteBtn.addEventListener('click', async () => {
             try {
                 const code = userData.ownReferralCode;
-                const shareUrl = `https://t.me/blacktestvbot?startapp=${code}`;
+                const shareUrl = `https://t.me/theblacktgbot?startapp=${code}`;
                 const message = `\nstart mining $BLACK today with one button!`;
 
                 if (window.Telegram?.WebApp) {
