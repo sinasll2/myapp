@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Basic meta -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>$BLACK</title>
+<!-- Styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<!-- Telegram integration -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Main container -->
+<div class="container">
+<!-- Mining tab -->
+<div id="mine-tab" class="tab-content active">
+<!-- Global stats -->
+<div class="card global-stats" style="position: relative;">
+<h2 class="card-title">Stats</h2>
+<span class="hint-icon">?</span>
+<div class="stats-row">
+<div>Total Mined</div>
+<div><span id="mined">0.000</span></div>
+</div>
+<div class="stats-row">
+<div>Total Miners</div>
+<div><span id="totalminers">0</span></div>
+</div>
+<div class="countdown" id="countdown">daily resets in 00:00:00 <div class="mining-hint">
+</div>
+</div>
+
+<!-- Modal -->
+<div id="infoModal" class="modal-overlay">
+  <div class="modal-window">
+    <button class="modal-close">&times;</button>
+    <h2>how it works?</h2>
+    <ol>
+      <li>
+        <strong>Mining Session:</strong><br>
+        Click “Start Mining” once per day and mining continues in the background, this means even when you close the mini app it still does the mining. Runs until the next reset at <strong>12:00 UTC</strong>.
+      </li>
+      <li>
+        <strong>Mining Rate:</strong><br>
+        You mine <strong>5 $BLACKs/day</strong> at default Mining Power (boost by codes).
+      </li>
+      <li>
+        <strong>Your Daily Code:</strong><br>
+        A new 10-character code is generated each day at 12:00 UTC.
+      </li>
+      <li>
+        <strong>Code Submissions:</strong><br>
+        Each user can submit one code per day to earn <strong>+0.5× Mining Power</strong>.
+        For each submission made to their code by others, they earn <strong>+0.2× Mining Power</strong> (up to 10 submissions per day).
+      </li>
+      <li>
+        <strong>Referrals:</strong><br>
+        New users who join via your link count as referrals you earn tokens for that.
+      </li>
+      <li>
+        <strong>Daily Reset:</strong><br>
+        At 12:00 UTC every day, all mining sessions stop, codes regenerate.
+      </li>
+    </ol>
+  </div>
+</div>
+<!-- Toggle Script -->
+<script>
+  const hintIcon = document.querySelector('.hint-icon');
+  const modal    = document.getElementById('infoModal');
+  const closeBtn = modal.querySelector('.modal-close');
+
+  hintIcon.addEventListener('click', () => {
+    modal.style.display = 'flex';
+  });
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
+</script>
+
+</div>
+
+<!-- User miner stats -->
+<div class="card">
+<h2 class="card-title">Miner</h2>
+<div class="stats-row">
+<div>Username</div>
+<div><span id="username">username</span></div>
+</div>
+<div class="stats-row">
+<div>Balance</div>
+<div><span id="balance">0.000</span> $BLACK</div>
+</div>
+<div class="stats-row">
+<div>Mining Power</div>
+<div>x<span id="power">1.0</span></div>
+</div>
+<button class="button" id="mineButton">
+    <span class="mining-text">Start Mining</span>
+    <span class="dots-container"></span>
+</button>
+<style>
+.dots-container {
+    display: inline-block;
+    width: 3ch;
+    text-align: left;
+    font-family: monospace;
+}
+</style>
+
+<!-- Upgrade -->
+<a href="https://t.me/blackupgradingbot?start=start" target="_blank" class="upgrade-button-link">
+  <button class="button">
+    Upgrade
+  </button>
+</a>
+
+<style>
+  .discount-float {
+    background: linear-gradient(135deg, #e44e50, #f0d54e);
+    color: #000000;
+    font-size: 0.9em;
+    font-weight: 900;
+    padding: 2px 6px;
+    margin-left: 8px;
+    border-radius: 6px;
+    vertical-align: middle;
+    display: inline-block;
+  }
+</style>
+
+
+</div>
+
+<!-- Codes -->
+<div class="card">
+<h2 class="card-title">Daily Code</h2>
+<div class="stats-row">
+<div>Your Code</div>
+<div><span id="dailyCode">…</span></div>
+</div>
+<div class="stats-row">
+<div>Total Codes You’ve Used</div>
+<div><span id="usersubs">0</span></div>
+</div>
+<div class="stats-row">
+<div>Your Code Usage Today</div>
+<div><span id="subsOfCode">0/10</span></div>
+</div>
+<div class="stats-row">
+<div>All Time Usage of Your Code</div>
+<div><span id="totalOfCode">0</span></div>
+</div>
+<div class="stats-row">
+<button class="button" id="copyButton">Copy</button>
+<button class="button" id="sendButton">Send</button>
+</div>
+<div class="stats-row">
+<input
+  type="text"
+  id="codeInput"
+  placeholder="enter code . . ."
+  class="input"
+  enterkeyhint="done"
+  autocomplete="off"
+  autocorrect="off"
+  autocapitalize="none"
+/></div>
+<div class="stats-row">
+<button class="button" id="submitButton">Submit</button>
+</div>
+</div>
+</div>
+
+<!-- Friends tab -->
+<div id="friends-tab" class="tab-content">
+<div class="card">
+  <h2 class="card-title">Friends</h2>
+  
+  <!-- Referral Info -->
+  <div class="stats-row" style="display: none !important;">
+    <div>Your Referral Code</div>
+    <div><span id="referralCode">...</span></div>
+  </div>
+  
+  <div class="stats-row">
+    <div>Total Invites</div>
+    <div><span id="totalReferrals"></span></div>
+  </div>
+  
+  <div class="stats-row" style="display: none !important;">
+    <div>Earned Bonus</div>
+    <div><span id="referralEarnings">0.000</span> $BLACK</div>
+  </div>
+
+<!-- Tier Progress -->
+<section class="referral-tiers">
+  <h3 class="tiers-title">Invite Rewards</h3>
+  <div class="tiers-container">
+    <article class="tier-card">
+      <div class="tier-header">
+        <span class="tier-label">1 Invite</span>
+        <span class="tier-badge">10 Tokens</span>
+      </div>
+    </article>
+    <article class="tier-card">
+      <div class="tier-header">
+        <span class="tier-label">5 Invites</span>
+        <span class="tier-badge">50 Tokens</span>
+      </div>
+    </article>
+    <article class="tier-card">
+      <div class="tier-header">
+        <span class="tier-label">10 Invites</span>
+        <span class="tier-badge">100 Tokens</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+  <!-- Referral Actions -->
+  <div class="stats-row">
+    <button class="button" id="copyReferralButton">Copy Link</button>
+    <button class="button" id="inviteButton">Invite</button>
+  </div>
+
+  <!-- Referred Friends List -->
+  <div class="friends-list">
+    <h3>Your Friends</h3>
+    <div id="friendsContainer" class="friends-container">
+      <!-- Friends will be listed here -->
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Tasks tab -->
+<div id="tasks-tab" class="tab-content">
+
+  <!-- Card: Earn -->
+  <div class="card">
+    <h2 class="card-title">Earn</h2>
+    <ul class="task-list">
+      <li class="task-item" data-task="join_channel">
+        <div class="task-desc">
+          Join our Telegram channel  
+          <a href="https://t.me/theblacktg" target="_blank"></a>
+        </div>
+        <span class="task-reward">+10 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="join_group">
+        <div class="task-desc">
+          Join our Telegram group  
+          <a href="https://t.me/theblacktgchat" target="_blank"></a>
+        </div>
+        <span class="task-reward">+10 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="follow_x">
+        <div class="task-desc">
+          Follow $BLACK X  
+          <a href="https://x.com/theblacktg" target="_blank"></a>
+        </div>
+        <span class="task-reward">+10 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Card: Others Using Your Code -->
+  <div class="card">
+    <h2 class="card-title">Others Using Your Code</h2>
+    <ul class="task-list">
+      <li class="task-item" data-task="code100">
+        <div class="task-desc">Reach 100 uses</div>
+        <span class="task-reward">+100 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="code200">
+        <div class="task-desc">Reach 200 uses</div>
+        <span class="task-reward">+200 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="code300">
+        <div class="task-desc">Reach 300 uses</div>
+        <span class="task-reward">+300 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Card: You Using Others’ Code -->
+  <div class="card">
+    <h2 class="card-title">You Using Others Code</h2>
+    <ul class="task-list">
+      <li class="task-item" data-task="code10">
+        <div class="task-desc">Use 10 Codes</div>
+        <span class="task-reward">+100 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="code20">
+        <div class="task-desc">Use 20 Codes</div>
+        <span class="task-reward">+200 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+
+      <li class="task-item" data-task="code30">
+        <div class="task-desc">Use 30 Codes</div>
+        <span class="task-reward">+300 $BLACK</span>
+        <button class="button complete-task">Claim</button>
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Leaders tab -->
+<div id="leaders-tab" class="tab-content">
+<div class="card leaderboard-card">
+<div class="card-header">
+<h2 class="card-title">Top Miners</h2>
+</div>
+<div class="leaderboard-container">
+
+<div class="leaderboard-header">
+<div class="header-item rank-header">#</div>
+<div class="header-item miner-header">Miner</div>
+<div class="header-item amount-header">$BLACKS</div>
+</div>
+      
+<div id="leaderboard-rows" class="leaderboard-body">
+<div class="loading-spinner"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card2"></div>
+
+<div class="stars"></div>
+  
+</div>
+
+<!-- Bottom navigation -->
+<div class="nav">
+  <button class="nav-item active" data-tab="mine-tab">
+    <span>Mine</span>
+  </button>
+  <button class="nav-item" data-tab="leaders-tab">
+    <span>Leaders</span>
+  </button>
+  <button class="nav-item" data-tab="tasks-tab">
+    <span>Earn</span>
+  </button>
+  <button class="nav-item" data-tab="friends-tab">
+    <span>Friends</span>
+  </button>
+</div>
+
+<!-- App scripts -->
+<script src="app.js" type="module"></script>
+<script type="module" src="leaders.js"></script>
+
+<script>
+  // Tab switching functionality
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+      // Remove active class from all nav items and tab contents
+      document.querySelectorAll('.nav-item').forEach(navItem => {
+        navItem.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Add active class to clicked nav item and corresponding tab
+      this.classList.add('active');
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+</script>
+
+<script>
+  const starsContainer = document.querySelector('.stars');
+  const starCount = 100;
+  const stars = [];
+  
+  function createStar() {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    
+    resetStar(star, true);
+    
+    starsContainer.appendChild(star);
+    stars.push(star);
+  }
+  
+  function resetStar(star, initial = false) {
+    // Random starting position inside viewport
+    star.x = Math.random() * window.innerWidth;
+    star.y = Math.random() * window.innerHeight;
+    
+    // Random gentle drifting velocity
+    star.vx = (Math.random() - 0.5) * 0.3;
+    star.vy = (Math.random() - 0.5) * 0.3;
+  
+    const size = 1 + Math.random() * 2;
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.opacity = (0.2 + Math.random() * 0.5).toFixed(2);
+    star.style.filter = `blur(${1 + Math.random() * 2}px)`;
+    
+    if (initial) {
+      star.style.transform = `translate(${star.x}px, ${star.y}px)`;
+    }
+  }
+  
+  function animateStars() {
+    for (const star of stars) {
+      star.x += star.vx;
+      star.y += star.vy;
+  
+      // If the star moves offscreen, reset it somewhere randomly
+      if (star.x < -50 || star.x > window.innerWidth + 50 || star.y < -50 || star.y > window.innerHeight + 50) {
+        resetStar(star);
+      }
+  
+      star.style.transform = `translate(${star.x}px, ${star.y}px)`;
+    }
+    requestAnimationFrame(animateStars);
+  }
+  
+  // Generate all stars
+  for (let i = 0; i < starCount; i++) {
+    createStar();
+  }
+  
+  // Animate
+  animateStars();
+  
+  // Optional: Reposition stars if window resizes
+  window.addEventListener('resize', () => {
+    stars.forEach(star => {
+      star.x = Math.random() * window.innerWidth;
+      star.y = Math.random() * window.innerHeight;
+    });
+  });
+</script>
+
+</body>
+</html>
