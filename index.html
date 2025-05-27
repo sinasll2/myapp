@@ -9,6 +9,23 @@
 <!-- Styles -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="style.css">
+
+<!-- Telegram Analytics SDK -->
+ <script 
+ async 
+ src="https://tganalytics.xyz/index.js" 
+ onload="initAnalytics()" 
+ type="text/javascript"
+></script>
+<script>
+function initAnalytics() {
+  window.telegramAnalytics.init({
+    token: 'eyJhcHBfbmFtZSI6ImJsYWNrIiwiYXBwX3VybCI6Imh0dHBzOi8vdC5tZS90aGVibGFja3RnYm90IiwiYXBwX2RvbWFpbiI6Imh0dHBzOi8vbXlhcHAtaGVubmEtZ2FtbWEudmVyY2VsLmFwcC8ifQ==!1/W0wiGMg/x8XRUFInqu3px7N+d9waNB7fxqnHOJn60=',
+    appName: 'black',
+  });
+}
+</script>
+
 <!-- Telegram integration -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
