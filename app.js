@@ -136,6 +136,7 @@ function saveMiningState() {
     localStorage.setItem('submittedCodes', JSON.stringify(userData.submittedCodes));
     localStorage.setItem('codeSubmissionsToday', userData.codeSubmissionsToday.toString());
     localStorage.setItem('totalCodeSubmissions', userData.totalCodeSubmissions.toString());
+     localStorage.setItem('tasksCompleted', JSON.stringify(userData.tasksCompleted));
 }
 
 function loadMiningState() {
@@ -144,6 +145,8 @@ function loadMiningState() {
     const storedCodes = JSON.parse(localStorage.getItem('submittedCodes') || '[]');
     const storedSubmissions = parseInt(localStorage.getItem('codeSubmissionsToday') || '0');
     const storedTotalSubmissions = parseInt(localStorage.getItem('totalCodeSubmissions') || '0');
+    const storedTasks = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
+  userData.tasksCompleted = storedTasks;
     
     if (storedReset && new Date() < new Date(storedReset)) {
         userData.isMining = storedIsMining;
@@ -340,10 +343,12 @@ async function handleTaskClick(task) {
         const exec = await functions.createExecution(FUNCTION_ID, JSON.stringify(payload));
         const data = JSON.parse(exec.responseBody || '{}');
         
-        if (data.success) {
-            userData.balance = data.balance;
-            userData.miningPower = data.mining_power;
-            userData.tasksCompleted[task] = true;
+    if (data.success) {
+      userData.tasksCompleted[task] = true;
+      userData.balance = data.balance;
+      userData.miningPower = data.mining_power;
+      
+      saveMiningState();
             
             refreshTasksState();
             updateUI();
