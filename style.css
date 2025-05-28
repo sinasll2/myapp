@@ -577,6 +577,12 @@ body:focus-within .container {
   opacity: 0.7;
 }
 
+.button.complete-task.claimed {
+    background-color: var(--claimed-color) !important;
+    cursor: default !important;
+    opacity: 0.8 !important;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 480px) {
   .task-item {

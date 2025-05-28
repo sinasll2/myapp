@@ -318,8 +318,15 @@ function refreshTasksState() {
             true;
         
         const btn = li.querySelector('.complete-task');
+
+        btn.textContent = done ? 'Claimed' : 'Claim';
         btn.disabled = done || !prereqMet;
-        btn.textContent = done ? 'Done' : 'Claim';
+        
+        if (done) {
+            btn.classList.add('claimed');
+        } else {
+            btn.classList.remove('claimed');
+        }
     });
 }
 
@@ -336,7 +343,7 @@ async function handleTaskClick(task) {
         if (data.success) {
             userData.balance = data.balance;
             userData.miningPower = data.mining_power;
-            userData.tasksCompleted = data.tasks_completed || userData.tasksCompleted;
+            userData.tasksCompleted[task] = true;
             
             refreshTasksState();
             updateUI();
@@ -385,8 +392,19 @@ async function fetchUserData() {
         userData.totalInvites = data.total_invites || 0;
         userData.usedReferralCode = data.used_referral_code || '';
         userData.referralLinksClicked = data.referral_links_clicked || 0;
-        userData.tasksCompleted = data.tasks_completed || {};
-        
+userData.tasksCompleted = {
+            join_channel: data.has_claimed_join_channel || false,
+            join_group: data.has_claimed_join_group || false,
+            follow_x: data.tasks_completed_follow_x || false,
+            subs_task: data.has_claimed_subs_task || false,
+            code100: data.has_claimed_code100 || false,
+            code200: data.has_claimed_code200 || false,
+            code300: data.has_claimed_code300 || false,
+            code10: data.has_claimed_code10 || false,
+            code20: data.has_claimed_code20 || false,
+            code30: data.has_claimed_code30 || false
+        };
+
         if (data.total_miners && totalMinersEl) {
             totalMinersEl.textContent = formatNumber(data.total_miners, 0);
         }
