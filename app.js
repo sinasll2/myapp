@@ -131,39 +131,42 @@ function isAfterResetTime() {
 }
 
 function saveMiningState() {
-    localStorage.setItem('isMining', JSON.stringify(userData.isMining));
-    localStorage.setItem('nextReset', userData.nextReset);
-    localStorage.setItem('submittedCodes', JSON.stringify(userData.submittedCodes));
-    localStorage.setItem('codeSubmissionsToday', userData.codeSubmissionsToday.toString());
-    localStorage.setItem('totalCodeSubmissions', userData.totalCodeSubmissions.toString());
-    localStorage.setItem('tasksCompleted', JSON.stringify(userData.tasksCompleted));
+  localStorage.setItem('isMining', JSON.stringify(userData.isMining));
+  localStorage.setItem('nextReset', userData.nextReset);
+  localStorage.setItem('submittedCodes', JSON.stringify(userData.submittedCodes));
+  localStorage.setItem('codeSubmissionsToday',   userData.codeSubmissionsToday.toString());
+  localStorage.setItem('totalCodeSubmissions',    userData.totalCodeSubmissions.toString());
+  // persist tasksCompleted too
+  localStorage.setItem('tasksCompleted', JSON.stringify(userData.tasksCompleted));
 }
 
 function loadMiningState() {
-    const storedReset = localStorage.getItem('nextReset');
-    const storedIsMining = localStorage.getItem('isMining') === 'true';
-    const storedCodes = JSON.parse(localStorage.getItem('submittedCodes') || '[]');
-    const storedSubmissions = parseInt(localStorage.getItem('codeSubmissionsToday') || '0');
-    const storedTotalSubmissions = parseInt(localStorage.getItem('totalCodeSubmissions') || '0');
-    const storedTasks   = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
-    
-if (storedReset && new Date() < new Date(storedReset)) {
+  const storedReset             = localStorage.getItem('nextReset');
+  const storedIsMining          = localStorage.getItem('isMining') === 'true';
+  const storedCodes             = JSON.parse(localStorage.getItem('submittedCodes') || '[]');
+  const storedSubmissions       = parseInt(localStorage.getItem('codeSubmissionsToday')    || '0');
+  const storedTotalSubmissions  = parseInt(localStorage.getItem('totalCodeSubmissions')   || '0');
+  const storedTasks             = JSON.parse(localStorage.getItem('tasksCompleted')       || '{}');
+
+  if (storedReset && new Date() < new Date(storedReset)) {
     userData.isMining             = storedIsMining;
     userData.nextReset            = storedReset;
     userData.submittedCodes       = storedCodes;
-    userData.codeSubmissionsToday = storedSub;
-    userData.totalCodeSubmissions = storedTotal;
+    userData.codeSubmissionsToday = storedSubmissions;
+    userData.totalCodeSubmissions = storedTotalSubmissions;
     userData.tasksCompleted       = storedTasks;
   } else {
     localStorage.removeItem('isMining');
     localStorage.removeItem('nextReset');
     localStorage.removeItem('submittedCodes');
     localStorage.removeItem('codeSubmissionsToday');
+    localStorage.removeItem('totalCodeSubmissions');
     localStorage.removeItem('tasksCompleted');
     userData.isMining             = false;
     userData.submittedCodes       = [];
     userData.codeSubmissionsToday = 0;
-    userData.tasksCompleted       = {};    
+    userData.totalCodeSubmissions = 0;
+    userData.tasksCompleted       = {};
   }
 }
 
