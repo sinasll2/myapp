@@ -136,7 +136,7 @@ function saveMiningState() {
     localStorage.setItem('submittedCodes', JSON.stringify(userData.submittedCodes));
     localStorage.setItem('codeSubmissionsToday', userData.codeSubmissionsToday.toString());
     localStorage.setItem('totalCodeSubmissions', userData.totalCodeSubmissions.toString());
-     localStorage.setItem('tasksCompleted', JSON.stringify(userData.tasksCompleted));
+    localStorage.setItem('tasksCompleted', JSON.stringify(userData.tasksCompleted));
 }
 
 function loadMiningState() {
@@ -145,24 +145,26 @@ function loadMiningState() {
     const storedCodes = JSON.parse(localStorage.getItem('submittedCodes') || '[]');
     const storedSubmissions = parseInt(localStorage.getItem('codeSubmissionsToday') || '0');
     const storedTotalSubmissions = parseInt(localStorage.getItem('totalCodeSubmissions') || '0');
-    const storedTasks = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
-  userData.tasksCompleted = storedTasks;
+    const storedTasks   = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
     
-    if (storedReset && new Date() < new Date(storedReset)) {
-        userData.isMining = storedIsMining;
-        userData.nextReset = storedReset;
-        userData.submittedCodes = storedCodes;
-        userData.codeSubmissionsToday = storedSubmissions;
-        userData.totalCodeSubmissions = storedTotalSubmissions;
-    } else {
-        localStorage.removeItem('isMining');
-        localStorage.removeItem('nextReset');
-        localStorage.removeItem('submittedCodes');
-        localStorage.removeItem('codeSubmissionsToday');
-        userData.isMining = false;
-        userData.submittedCodes = [];
-        userData.codeSubmissionsToday = 0;
-    }
+if (storedReset && new Date() < new Date(storedReset)) {
+    userData.isMining             = storedIsMining;
+    userData.nextReset            = storedReset;
+    userData.submittedCodes       = storedCodes;
+    userData.codeSubmissionsToday = storedSub;
+    userData.totalCodeSubmissions = storedTotal;
+    userData.tasksCompleted       = storedTasks;
+  } else {
+    localStorage.removeItem('isMining');
+    localStorage.removeItem('nextReset');
+    localStorage.removeItem('submittedCodes');
+    localStorage.removeItem('codeSubmissionsToday');
+    localStorage.removeItem('tasksCompleted');
+    userData.isMining             = false;
+    userData.submittedCodes       = [];
+    userData.codeSubmissionsToday = 0;
+    userData.tasksCompleted       = {};    
+  }
 }
 
 function initializeUser() {
@@ -321,44 +323,38 @@ function refreshTasksState() {
             true;
         
         const btn = li.querySelector('.complete-task');
-
-        btn.textContent = done ? 'Claimed' : 'Claim';
         btn.disabled = done || !prereqMet;
-        
-        if (done) {
-            btn.classList.add('claimed');
-        } else {
-            btn.classList.remove('claimed');
-        }
+        btn.textContent = done ? 'Claimed' : 'Claim';
     });
 }
 
 async function handleTaskClick(task) {
-    try {
-        const payload = {
-            ...initializeUser(),
-            action: 'complete_task',
-            task
-        };
-        const exec = await functions.createExecution(FUNCTION_ID, JSON.stringify(payload));
-        const data = JSON.parse(exec.responseBody || '{}');
-        
+  try {
+    const payload = {
+      ...initializeUser(),
+      action: 'complete_task',
+      task
+    };
+    const exec = await functions.createExecution(FUNCTION_ID, JSON.stringify(payload));
+    const data = JSON.parse(exec.responseBody || '{}');
+
     if (data.success) {
+      // update local userData
+      userData.balance         = data.balance;
+      userData.miningPower     = data.mining_power;
+      // **mark the task done locally**
       userData.tasksCompleted[task] = true;
-      userData.balance = data.balance;
-      userData.miningPower = data.mining_power;
-      
-      saveMiningState();
-            
-            refreshTasksState();
-            updateUI();
-        } else {
-            showToast(data.message || 'Task failed');
-        }
-    } catch (err) {
-        console.error('Task error:', err);
-        tgAlert(err.message || 'Error completing task');
+
+      // re‑render
+      refreshTasksState();
+      updateUI();
+    } else {
+      showToast(data.message || 'Task failed');
     }
+  } catch (err) {
+    console.error('Task error:', err);
+    tgAlert(err.message || 'Error completing task');
+  }
 }
 
 taskItems.forEach(li => {
@@ -397,19 +393,8 @@ async function fetchUserData() {
         userData.totalInvites = data.total_invites || 0;
         userData.usedReferralCode = data.used_referral_code || '';
         userData.referralLinksClicked = data.referral_links_clicked || 0;
-userData.tasksCompleted = {
-            join_channel: data.has_claimed_join_channel || false,
-            join_group: data.has_claimed_join_group || false,
-            follow_x: data.tasks_completed_follow_x || false,
-            subs_task: data.has_claimed_subs_task || false,
-            code100: data.has_claimed_code100 || false,
-            code200: data.has_claimed_code200 || false,
-            code300: data.has_claimed_code300 || false,
-            code10: data.has_claimed_code10 || false,
-            code20: data.has_claimed_code20 || false,
-            code30: data.has_claimed_code30 || false
-        };
-
+        userData.tasksCompleted = data.tasks_completed || {};
+        
         if (data.total_miners && totalMinersEl) {
             totalMinersEl.textContent = formatNumber(data.total_miners, 0);
         }
