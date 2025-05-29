@@ -611,36 +611,27 @@ if (submitBtn) {
     });
 }
 
-if (sendBtn) {
-  sendBtn.addEventListener('click', async () => {
-    const dailyCode   = dailyCodeEl.textContent.trim();
-    const referral    = userData.ownReferralCode;
-
-    // 1️⃣ Use a fenced code-block – Telegram supports ``` on every client
-    // 2️⃣ Build the whole message first, THEN encode it once
-    const shareText = [
-      'Use my *BLACK* code today:',
-      '```',           // opening fence
-      dailyCode,
-      '```'            // closing fence
-    ].join('\n');
-
-    const shareUrl = `https://t.me/theblacktgbot?startapp=${referral}`;
-
-    const link = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.openTelegramLink(link);
-    } else {
-      await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-      alert('Code copied to clipboard!');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', async () => {
+          const dailyCode    = dailyCodeEl.textContent.trim();
+          const referralCode = userData.ownReferralCode;
+      
+          const shareText = `\nUse my $BLACK code today\n\`${dailyCode}\``;
+          const shareUrl  = `https://t.me/theblacktgbot?startapp=${referralCode}`;
+            
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(
+                    `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
+                );
+            } else {
+                navigator.clipboard.writeText(shareText);
+                alert('Code copied to clipboard!');
+            }
+            
+            sendBtn.textContent = 'Sending';
+            setTimeout(() => sendBtn.textContent = 'Send', 2000);
+        });
     }
-
-    sendBtn.textContent = 'Sending…';
-    setTimeout(() => (sendBtn.textContent = 'Send'), 2000);
-  });
-}
-
 
 if (copyReferralBtn) {
     copyReferralBtn.addEventListener('click', async () => {
