@@ -613,29 +613,34 @@ if (submitBtn) {
 
 if (sendBtn) {
   sendBtn.addEventListener('click', async () => {
-    const dailyCode    = dailyCodeEl.textContent.trim();
-    const referralCode = userData.ownReferralCode;
+    const dailyCode   = dailyCodeEl.textContent.trim();
+    const referral    = userData.ownReferralCode;
 
+    // 1️⃣ Use a fenced code-block – Telegram supports ``` on every client
+    // 2️⃣ Build the whole message first, THEN encode it once
     const shareText = [
       'Use my *BLACK* code today:',
-      `\`${dailyCode}\``,
-      '',
-      `https://t.me/theblacktgbot?startapp=${referralCode}`
+      '```',           // opening fence
+      dailyCode,
+      '```'            // closing fence
     ].join('\n');
 
+    const shareUrl = `https://t.me/theblacktgbot?startapp=${referral}`;
+
+    const link = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+
     if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.openTelegramLink(
-        `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/theblacktgbot?startapp=${referralCode}`)}&text=${encodeURIComponent(shareText)}`
-      );
+      window.Telegram.WebApp.openTelegramLink(link);
     } else {
-      navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
       alert('Code copied to clipboard!');
     }
 
-    sendBtn.textContent = 'Sending';
-    setTimeout(() => sendBtn.textContent = 'Send', 2000);
+    sendBtn.textContent = 'Sending…';
+    setTimeout(() => (sendBtn.textContent = 'Send'), 2000);
   });
 }
+
 
 if (copyReferralBtn) {
     copyReferralBtn.addEventListener('click', async () => {
