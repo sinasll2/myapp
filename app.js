@@ -611,28 +611,33 @@ if (submitBtn) {
     });
 }
 
-    if (sendBtn) {
-        sendBtn.addEventListener('click', async () => {
-          const dailyCode    = dailyCodeEl.textContent.trim();
-          const referralCode = userData.ownReferralCode;
-      
-          const shareText = `\nUse my $BLACK code today\n\`${dailyCode}\``;
-          const shareUrl  = `https://t.me/theblacktgbot?startapp=${referralCode}`;
-            
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(
-                    `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
-                );
-            } else {
-                navigator.clipboard.writeText(shareText);
-                alert('Code copied to clipboard!');
-            }
-            
-            sendBtn.textContent = 'Sending';
-            setTimeout(() => sendBtn.textContent = 'Send', 2000);
-        });
-    }
+if (sendBtn) {
+  sendBtn.addEventListener('click', async () => {
+    const dailyCode    = dailyCodeEl.textContent.trim();
+    const referralCode = userData.ownReferralCode;
 
+    const shareText = 
+      `\nUse my *BLACK* code today\n` +
+      `\`${dailyCode}\``;
+    const shareUrl  = `https://t.me/theblacktgbot?startapp=${referralCode}`;
+    
+    const tgShareLink = 
+      `https://t.me/share/url` +
+      `?url=${encodeURIComponent(shareUrl)}` +
+      `&text=${encodeURIComponent(shareText)}` +
+      `&parse_mode=Markdown`;
+
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openTelegramLink(tgShareLink);
+    } else {
+      navigator.clipboard.writeText(shareText);
+      alert('Code copied to clipboard!');
+    }
+    
+    sendBtn.textContent = 'Sending';
+    setTimeout(() => sendBtn.textContent = 'Send', 2000);
+  });
+}
 
 if (copyReferralBtn) {
     copyReferralBtn.addEventListener('click', async () => {
