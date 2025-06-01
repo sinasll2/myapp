@@ -611,27 +611,42 @@ if (submitBtn) {
     });
 }
 
-    if (sendBtn) {
-        sendBtn.addEventListener('click', async () => {
-          const dailyCode    = dailyCodeEl.textContent.trim();
-          const referralCode = userData.ownReferralCode;
-      
-          const shareText = `\nUse my $BLACK code today\n\`${dailyCode}\``;
-          const shareUrl  = `https://t.me/theblacktgbot?startapp=${referralCode}`;
-            
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(
-                    `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
-                );
-            } else {
-                navigator.clipboard.writeText(shareText);
-                alert('Code copied to clipboard!');
-            }
-            
-            sendBtn.textContent = 'Sending';
-            setTimeout(() => sendBtn.textContent = 'Send', 2000);
-        });
+if (sendBtn) {
+  sendBtn.addEventListener('click', async () => {
+    // 1) Grab today's code and your referral code:
+    const dailyCode    = dailyCodeEl.textContent.trim();  // e.g. "D6477XJD22"
+    const referralCode = userData.ownReferralCode;        // e.g. "ABC123"
+
+    // 2) Construct the MarkdownV2 message.
+    //    We wrap the code in backticks (`…`) so Telegram knows it’s inline‑code.
+    const shareTextMarkdown = [
+      "Use my $BLACK code today",
+      "`" + dailyCode + "`"
+    ].join("\n");
+    // → "Use my $BLACK code today\n`D6477XJD22`"
+
+    // 3) URL‑encode that string:
+    const encodedText = encodeURIComponent(shareTextMarkdown);
+
+    // 4) Build the Telegram share link.
+    //    The “url=” part is your bot’s start link with referral, and “&text=” is the MarkdownV2 text.
+    const shareUrl =
+      "https://t.me/share/url?" +
+      "url="  + encodeURIComponent(`https://t.me/theblacktgbot?startapp=${referralCode}`) +
+      "&text=" + encodedText;
+
+    // 5) Open it in Telegram (via WebApp) or fall back to copying:
+    if (window.Telegram?.WebApp) {
+      window.Telegram.WebApp.openTelegramLink(shareUrl);
+    } else {
+      navigator.clipboard.writeText(shareTextMarkdown);
+      alert("MarkdownV2 text copied to clipboard!");
     }
+
+    sendBtn.textContent = 'Sending';
+    setTimeout(() => sendBtn.textContent = 'Send', 2000);
+  });
+}
 
 if (copyReferralBtn) {
     copyReferralBtn.addEventListener('click', async () => {
@@ -647,27 +662,43 @@ if (copyReferralBtn) {
     });
 }
 
-
-    if (inviteBtn) {
-        inviteBtn.addEventListener('click', async () => {
-            try {
-                const code = userData.ownReferralCode;
-                const shareUrl = `https://t.me/theblacktgbot?startapp=${code}`;
-                const message = `\nstart mining $BLACK today with one button!`;
-
-                if (window.Telegram?.WebApp) {
-                    window.Telegram.WebApp.openTelegramLink(
-                        `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(message)}`
-                    );
-                } else {
-                    const shareLink = `tg://msg?text=${encodeURIComponent(message)}`;
-                    window.open(shareLink, '_blank');
-                }
-            } catch (error) {
-                console.error('Sharing failed:', error);
+if (inviteBtn) {
+    inviteBtn.addEventListener('click', async () => {
+        try {
+            const code = userData.ownReferralCode;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/theblacktgbot?startapp=${code}`)}&text=${encodeURIComponent("start mining $BLACK today with one button!")}`;
+            
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(shareUrl);
+            } else {
+                const shareLink = `tg://msg?text=${encodeURIComponent("start mining $BLACK today with one button!")}`;
+                window.open(shareLink, '_blank');
             }
+        } catch (error) {
+            console.error('Sharing failed:', error);
+        }
+    });
+}
+
+function setupTabs() {
+    const tabLinks = document.querySelectorAll('.tab-list li a');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-list li a').forEach(tabLink => {
+                tabLink.classList.remove('active');
+            });
+            
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            this.classList.add('active');
         });
-    }
+    });
 }
 
 async function init() {
@@ -683,11 +714,11 @@ async function init() {
     loadMiningState();
     
     try {
-    await fetchUserData();
-    await fetchReferredFriends();
-  } catch (error) {
-    console.error('Initialization error:', error);
-  }
+      await fetchUserData();
+      await fetchReferredFriends();
+    } catch (error) {
+      console.error('Initialization error:', error);
+    }
 
     setInterval(updateCountdown, 1000);
     setInterval(async () => {
