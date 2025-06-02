@@ -47,10 +47,12 @@ function renderLeaderboard(leaderboard) {
   }
 
   function formatNumber(num) {
-    return Number(num).toLocaleString('en-US', {
-      minimumFractionDigits: 3,
-      maximumFractionDigits: 3
-    });
+    if (isNaN(num)) return '0.00';
+    const parts = Number(num).toFixed(2).split('.');
+    const wholePart = parts[0];
+    const decimalPart = parts[1];
+    const formattedWhole = wholePart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return formattedWhole + '.' + decimalPart;
   }
   
   leaderboard.forEach(miner => {
