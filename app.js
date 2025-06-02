@@ -106,15 +106,15 @@ function tgAlert(message) {
 
 
 // Helper function to format numbers
-function formatNumber(num, decimals = 2) {
-    if (isNaN(num)) return '0.00';
+function formatNumber(num, decimals = 3) {
+    if (isNaN(num)) return '0' + '0'.repeat(decimals);
     
     const parts = Number(num).toFixed(decimals).split('.');
     const wholePart = parts[0];
-    const decimalPart = parts[1];
+    const decimalPart = parts[1] || '';
     
     const formattedWhole = wholePart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return formattedWhole + '.' + decimalPart;
+    return formattedWhole + (decimalPart ? '.' + decimalPart : '');
 }
 
 function getDefaultResetTime() {
@@ -236,34 +236,35 @@ if (userData.isMining) {
 }
 
 function updateUI() {
-    try {
-        if (balanceEl) balanceEl.textContent = formatNumber(userData.balance);
-        if (minedEl)  minedEl.textContent = formatNumber(userData.totalMined);
-        if (powerEl)  powerEl.textContent = formatNumber(userData.miningPower);
+  try {
+    if (balanceEl) balanceEl.textContent = formatNumber(userData.balance);
+    if (minedEl)  minedEl.textContent = formatNumber(userData.totalMined);
+    if (powerEl)  powerEl.textContent = formatNumber(userData.miningPower, 1);
 
-        if (mineBtn) {
-            mineBtn.disabled = userData.isMining || isAfterResetTime();
-            if (userData.isMining) {
-                startDotAnimation();
-            } else {
-                stopDotAnimation();
-            }
+    if (mineBtn) {
+        mineBtn.disabled = userData.isMining || isAfterResetTime();
+        // Button text reflects mining state from backend
+        if (userData.isMining) {
+            startDotAnimation();
+        } else {
+            stopDotAnimation();
         }
-
-        if (dailyCodeEl)       dailyCodeEl.textContent = userData.dailyCode;
-        if (subsOfCodeEl)      subsOfCodeEl.textContent = `${formatNumber(userData.codeSubmissionsToday)}/10`;
-        if (totalOfCodeEl)     totalOfCodeEl.textContent = formatNumber(userData.totalCodeSubmissions);
-        if (usersubsEl)        usersubsEl.textContent = formatNumber(userData.totalCodesSubmitted);
-        if (referralCountEl)   referralCountEl.textContent = formatNumber(userData.referrals);
-        if (referralEarningsEl)referralEarningsEl.textContent = formatNumber(userData.referralEarnings);
-        if (referralCodeEl)    referralCodeEl.textContent = userData.ownReferralCode;
-        if (totalReferralsEl)  totalReferralsEl.textContent = formatNumber(userData.totalInvites);
-        if (usedReferralCodeEl)usedReferralCodeEl.textContent = userData.usedReferralCode || 'None';
-
-        refreshTasksState();
-    } catch (error) {
-        console.error('UI update error:', error);
     }
+
+    if (dailyCodeEl)       dailyCodeEl.textContent = userData.dailyCode;
+    if (subsOfCodeEl)      subsOfCodeEl.textContent = `${formatNumber(userData.codeSubmissionsToday, 0)}/10`;
+    if (totalOfCodeEl)     totalOfCodeEl.textContent = formatNumber(userData.totalCodeSubmissions, 0);
+    if (usersubsEl)     usersubsEl.textContent = formatNumber(userData.totalCodesSubmitted, 0);
+    if (referralCountEl)   referralCountEl.textContent = formatNumber(userData.referrals, 0);
+    if (referralEarningsEl)referralEarningsEl.textContent = formatNumber(userData.referralEarnings);
+    if (referralCodeEl)    referralCodeEl.textContent = userData.ownReferralCode;
+    if (totalReferralsEl)  totalReferralsEl.textContent = formatNumber(userData.totalInvites, 0);
+    if (usedReferralCodeEl)usedReferralCodeEl.textContent = userData.usedReferralCode || 'None';
+
+    refreshTasksState();
+  } catch (error) {
+    console.error('UI update error:', error);
+  }
 }
 
 function updateCountdown() {
@@ -397,9 +398,9 @@ async function fetchUserData() {
         userData.referralLinksClicked = data.referral_links_clicked || 0;
         userData.tasksCompleted = data.tasks_completed || {};
         
-if (data.total_miners && totalMinersEl) {
-    totalMinersEl.textContent = formatNumber(data.total_miners);
-}
+        if (data.total_miners && totalMinersEl) {
+            totalMinersEl.textContent = formatNumber(data.total_miners, 0);
+        }
 
         saveMiningState();
         updateUI();
