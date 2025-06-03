@@ -284,83 +284,129 @@
     </div>
 
     <div id="tasks-tab" class="tab-content">
-      <div class="card">
-        <h2 class="card-title">Earn</h2>
-        <ul class="task-list">
-          <li class="task-item" data-task="join_channel">
-            <div class="task-desc">
-              Join our Telegram channel
-              <a href="https://t.me/theblacktg" target="_blank"></a>
-            </div>
-            <span class="task-reward">+10 $BLACK</span>
-            <button class="button complete-task">Join</button>
-          </li>
+      <div class="tabs-container">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-target="tab-main">Main</button>
+          <button class="tab-btn" data-target="tab-dailycode">Daily Code</button>
+        </div>
 
-          <li class="task-item" data-task="join_group">
-            <div class="task-desc">
-              Join our Telegram group
-              <a href="https://t.me/theblacktgchat" target="_blank"></a>
-            </div>
-            <span class="task-reward">+10 $BLACK</span>
-            <button class="button complete-task">Join</button>
-          </li>
+        <div class="tabs-content">
+          <div id="tab-main" class="tab-pane active">
+            <div class="card">
+              <h2 class="card-title">Earn</h2>
+              <ul class="task-list">
+                <li class="task-item" data-task="join_channel">
+                  <div class="task-desc">
+                    Join our Telegram channel
+                    <a
+                      href="https://t.me/theblacktg"
+                      target="_blank"
+                    ></a>
+                  </div>
+                  <span class="task-reward">+10 $BLACK</span>
+                  <button class="button complete-task">Join</button>
+                </li>
 
-          <li class="task-item" data-task="follow_x">
-            <div class="task-desc">
-              Follow $BLACK X
-              <a href="https://x.com/theblacktg" target="_blank"></a>
+                <li class="task-item" data-task="join_group">
+                  <div class="task-desc">
+                    Join our Telegram group
+                    <a
+                      href="https://t.me/theblacktgchat"
+                      target="_blank"
+                    ></a>
+                  </div>
+                  <span class="task-reward">+10 $BLACK</span>
+                  <button class="button complete-task">Join</button>
+                </li>
+
+                <li class="task-item" data-task="follow_x">
+                  <div class="task-desc">
+                    Follow $BLACK X
+                    <a
+                      href="https://x.com/theblacktg"
+                      target="_blank"
+                    ></a>
+                  </div>
+                  <span class="task-reward">+10 $BLACK</span>
+                  <button class="button complete-task">Follow</button>
+                </li>
+              </ul>
             </div>
-            <span class="task-reward">+10 $BLACK</span>
-            <button class="button complete-task">Follow</button>
-          </li>
-        </ul>
+          </div>
+
+          <div id="tab-dailycode" class="tab-pane">
+            <div class="card">
+              <h2 class="card-title">Others Using Your Code</h2>
+              <ul class="task-list">
+                <li class="task-item" data-task="code100">
+                  <div class="task-desc">Reach 100 uses</div>
+                  <span class="task-reward">+100 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+
+                <li class="task-item" data-task="code200">
+                  <div class="task-desc">Reach 200 uses</div>
+                  <span class="task-reward">+200 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+
+                <li class="task-item" data-task="code300">
+                  <div class="task-desc">Reach 300 uses</div>
+                  <span class="task-reward">+300 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+              </ul>
+            </div>
+
+            <div class="card" style="margin-top: 24px;">
+              <h2 class="card-title">You Using Others Code</h2>
+              <ul class="task-list">
+                <li class="task-item" data-task="code10">
+                  <div class="task-desc">Use 10 Codes</div>
+                  <span class="task-reward">+100 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+
+                <li class="task-item" data-task="code20">
+                  <div class="task-desc">Use 20 Codes</div>
+                  <span class="task-reward">+200 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+
+                <li class="task-item" data-task="code30">
+                  <div class="task-desc">Use 30 Codes</div>
+                  <span class="task-reward">+300 $BLACK</span>
+                  <button class="button complete-task">Claim</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <h2 class="card-title">Others Using Your Code</h2>
-        <ul class="task-list">
-          <li class="task-item" data-task="code100">
-            <div class="task-desc">Reach 100 uses</div>
-            <span class="task-reward">+100 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
+      <script>
+        document
+          .querySelectorAll('.tabs-container .tab-btn')
+          .forEach((button) => {
+            button.addEventListener('click', () => {
+              const parentTabs = button.closest('.tabs-container');
+              const targetId = button.getAttribute('data-target');
 
-          <li class="task-item" data-task="code200">
-            <div class="task-desc">Reach 200 uses</div>
-            <span class="task-reward">+200 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
+              parentTabs
+                .querySelectorAll('.tab-btn')
+                .forEach((btn) => btn.classList.remove('active'));
 
-          <li class="task-item" data-task="code300">
-            <div class="task-desc">Reach 300 uses</div>
-            <span class="task-reward">+300 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
-        </ul>
-      </div>
+              parentTabs
+                .querySelectorAll('.tab-pane')
+                .forEach((pane) => pane.classList.remove('active'));
 
-      <div class="card">
-        <h2 class="card-title">You Using Others Code</h2>
-        <ul class="task-list">
-          <li class="task-item" data-task="code10">
-            <div class="task-desc">Use 10 Codes</div>
-            <span class="task-reward">+100 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
-
-          <li class="task-item" data-task="code20">
-            <div class="task-desc">Use 20 Codes</div>
-            <span class="task-reward">+200 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
-
-          <li class="task-item" data-task="code30">
-            <div class="task-desc">Use 30 Codes</div>
-            <span class="task-reward">+300 $BLACK</span>
-            <button class="button complete-task">Claim</button>
-          </li>
-        </ul>
-      </div>
+              button.classList.add('active');
+              parentTabs
+                .querySelector('#' + targetId)
+                .classList.add('active');
+            });
+          });
+      </script>
     </div>
 
     <div id="leaders-tab" class="tab-content">
