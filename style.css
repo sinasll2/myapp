@@ -522,8 +522,8 @@ input[type="submit"] {
   opacity: 0.8 !important;
 }
 
-
-.hint-icon {
+.hint-icon,
+.support-icon {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -544,7 +544,8 @@ input[type="submit"] {
   z-index: 10;
 }
 
-.hint-icon:hover {
+.hint-icon:hover,
+.support-icon:hover {
   background: var(--accent-color);
   color: var(--secondary-bg);
   transform: scale(1.1);
