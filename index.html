@@ -70,7 +70,7 @@
 
         <div class="stats-row">
           <div>Total Miners</div>
-          <div><span id="totalminers">653</span></div>
+          <div><span id="totalminers">656</span></div>
         </div>
 <a href="https://t.me/tapps_bot/center?startapp=app_black" target="_blank" class="upgrade-button-link">
   <button class="button">
@@ -569,5 +569,17 @@
       });
     });
   </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const hfAPI = window.Telegram?.WebApp?.HapticFeedback;
+      if (!hfAPI?.impactOccurred) return;
+      const heavyHaptic = () => hfAPI.impactOccurred('heavy');
+      document
+        .querySelectorAll('button, .nav-item')
+        .forEach(el => el.addEventListener('click', heavyHaptic));
+    });
+  </script>
+
 </body>
 </html>
