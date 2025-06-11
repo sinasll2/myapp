@@ -543,67 +543,90 @@ function setupEventListeners() {
 }
 
 if (submitBtn) {
-    // Function to dismiss keyboard
-    const dismissKeyboard = () => {
-        if (document.activeElement === codeInput) {
-            codeInput.blur(); // This removes focus and hides keyboard
+  const dismissKeyboard = () => {
+    if (document.activeElement === codeInput) {
+      codeInput.blur();
+    }
+  };
+
+  submitBtn.addEventListener('click', async () => {
+    const submittedCode = codeInput.value.trim();
+    if (!submittedCode) {
+      return tgAlert('Please enter a code to submit');
+    }
+
+    try {
+      const payload = {
+        ...initializeUser(),
+        action: 'submit_code',
+        code: submittedCode
+      };
+
+      const execution = await functions.createExecution(FUNCTION_ID, JSON.stringify(payload));
+      const data = JSON.parse(execution.responseBody || '{}');
+
+      if (data.success) {
+        userData.balance               = data.balance;
+        userData.submittedCodes        = [...userData.submittedCodes, submittedCode];
+        userData.codeSubmissionsToday  = data.owner_submissions      || userData.codeSubmissionsToday;
+        userData.totalCodeSubmissions  = data.total_code_submissions  || userData.totalCodeSubmissions;
+        userData.totalCodesSubmitted   = data.total_codes_submitted   || userData.totalCodesSubmitted;
+        saveMiningState();
+        updateUI();
+
+        if (data.reward_type) {
+          switch (data.reward_type) {
+            case 'temporary_mining_power':
+              showToast(
+                `Temporary boost! +${data.reward_value.toFixed(1)}× mining power until daily reset.`,
+                'success'
+              );
+              break;
+            case 'permanent_mining_power':
+              showToast(
+                `Permanent upgrade! +${data.reward_value.toFixed(1)}× mining power unlocked.`,
+                'success'
+              );
+              break;
+            case 'balance':
+              showToast(
+                `You earned ${data.reward_value} $BLACK!`,
+                'success'
+              );
+              break;
+            default:
+              showToast(data.message || 'Code redeemed!', 'success');
+          }
+        } else {
+          showToast(data.message || 'Code submitted successfully!', 'success');
         }
-    };
 
-    submitBtn.addEventListener('click', async () => {
-        const submittedCode = codeInput.value.trim();
-        if (!submittedCode) return tgAlert('Please enter a code to submit');
+        codeInput.value = '';
+        dismissKeyboard();
 
-        try {
-            const payload = {
-                ...initializeUser(),
-                action: 'submit_code',
-                code: submittedCode
-            };
+      } else {
+        showToast(data.message || 'Code submission failed', 'error');
+      }
 
-            const execution = await functions.createExecution(FUNCTION_ID, JSON.stringify(payload));
-            const data = JSON.parse(execution.responseBody || '{}');
+    } catch (err) {
+      console.error('Code submission failed:', err);
+      tgAlert(err.message || 'Failed to submit code.');
+    }
+  });
 
-            if (data.success) {
-                userData.balance = data.balance;
-                userData.submittedCodes = [...userData.submittedCodes, submittedCode];
-                userData.codeSubmissionsToday = data.owner_submissions || userData.codeSubmissionsToday;
-                userData.totalCodeSubmissions = data.total_code_submissions || userData.totalCodeSubmissions;
-                userData.totalCodesSubmitted = data.total_codes_submitted || userData.totalCodesSubmitted;
+  codeInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitBtn.click();
+    }
+  });
 
-                saveMiningState();
-                updateUI();
-                showToast(data.message || 'Code submitted successfully!');
-                codeInput.value = '';
-                
-                // Dismiss keyboard after successful submission
-                dismissKeyboard();
-            } else {
-                showToast(data.message || 'Code submission failed');
-            }
-        } catch (err) {
-            console.error('Code submission failed:', err);
-            tgAlert(err.message || 'Failed to submit code.');
-        }
-    });
-
-    // Enter key support for code input
-    codeInput.addEventListener('keypress', async (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            dismissKeyboard(); // Dismiss keyboard when Enter pressed
-            submitBtn.click();
-        }
-    });
-
-    // Close keyboard when tapping outside
     document.addEventListener('touchstart', (e) => {
         if (!codeInput.contains(e.target)) {
             dismissKeyboard();
         }
     });
 
-    // Close keyboard when clicking outside (desktop)
     document.addEventListener('mousedown', (e) => {
         if (!codeInput.contains(e.target)) {
             dismissKeyboard();
